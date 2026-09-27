@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{subject}}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f6f8; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f6f8; padding: 30px 10px;">
+    <tr>
+      <td align="center">
+        <!-- Main Card Container -->
+        <table role="presentation" width="100%" style="max-width: 550px; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e5e7eb;">
+          
+          <!-- Email Header -->
+          <tr>
+            <td style="background-color: #1e293b; padding: 25px 30px; text-align: center;">
+              <h1 style="color: #ffffff; font-size: 22px; font-weight: 700; margin: 0; letter-spacing: 0.5px;">
+                {{appName}}
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Dynamic Template Body Content -->
+          <tr>
+            <td style="padding: 35px 30px; color: #334155; font-size: 15px; line-height: 1.6;">
+              {{bodyContent}}
+            </td>
+          </tr>
+
+          <!-- Email Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 20px 30px; text-align: center; border-top: 1px solid #f1f5f9; color: #94a3b8; font-size: 12px;">
+              <p style="margin: 0 0 6px 0;">This is an automated security notification from {{appName}}.</p>
+              <p style="margin: 0;">&copy; {{currentYear}} {{appName}}. All rights reserved.</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

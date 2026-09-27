@@ -1,0 +1,8 @@
+{
+  "INVALID_CREDENTIALS": "Invalid email or password.",
+  "EMAIL_ALREADY_EXISTS": "An account with this email address already exists. Please sign in instead.",
+  "INVALID_OTP": "Invalid or expired OTP code.",
+  "TOO_MANY_ATTEMPTS": "Maximum verification attempts exceeded. Please request a new OTP.",
+  "USER_NOT_FOUND": "User profile not found.",
+  "UNAUTHORIZED": "Access token is missing or invalid. Please log in."
+}

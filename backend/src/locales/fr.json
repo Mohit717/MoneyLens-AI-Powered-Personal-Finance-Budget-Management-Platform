@@ -1,0 +1,9 @@
+{
+  "INVALID_CREDENTIALS": "Adresse e-mail ou mot de passe incorrect.",
+  "EMAIL_ALREADY_EXISTS": "Un compte existe déjà avec cette adresse e-mail. Veuillez vous connecter.",
+  "INVALID_OTP": "Code OTP invalide ou expiré.",
+  "TOO_MANY_ATTEMPTS": "Nombre maximal de tentatives dépassé. Veuillez demander un nouvel OTP.",
+  "USER_NOT_FOUND": "Profil utilisateur introuvable.",
+  "UNAUTHORIZED": "Jeton d'accès manquant ou invalide."
+}
+

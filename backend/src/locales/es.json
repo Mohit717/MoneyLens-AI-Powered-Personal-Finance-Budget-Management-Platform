@@ -1,0 +1,9 @@
+{
+  "INVALID_CREDENTIALS": "Correo electrónico o contraseña no válidos.",
+  "EMAIL_ALREADY_EXISTS": "Ya existe una cuenta con este correo electrónico. Por favor, inicie sesión.",
+  "INVALID_OTP": "Código OTP no válido o caducado.",
+  "TOO_MANY_ATTEMPTS": "Se ha superado el número máximo de intentos. Solicite un nuevo OTP.",
+  "USER_NOT_FOUND": "Perfil de usuario no encontrado.",
+  "UNAUTHORIZED": "Token de acceso no válido o ausente."
+}
+

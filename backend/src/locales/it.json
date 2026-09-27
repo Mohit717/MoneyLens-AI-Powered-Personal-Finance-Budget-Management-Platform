@@ -1,0 +1,14 @@
+{
+    "INTERNAL_SERVER_ERROR": "Si è verificato un errore imprevisto.",
+    "INVALID_CREDENTIALS": "Email o password non valide.",
+    "EMAIL_ALREADY_EXISTS": "Esiste già un account con questo indirizzo email. Accedi invece.",
+    "INVALID_OTP": "Codice OTP non valido o scaduto.",
+    "TOO_MANY_ATTEMPTS": "È stato superato il numero massimo di tentativi di verifica. Richiedi un nuovo OTP.",
+    "MISSING_TOKEN": "Il token di accesso è mancante. Effettua l'accesso.",
+    "UNAUTHORIZED": "Token di accesso non valido o scaduto.",
+    "SESSION_ERROR": "Sessione non trovata.",
+    "SECURITY_BREACH_DETECTED": "Il token di aggiornamento revocato è stato riutilizzato. Tutte le sessioni di questa famiglia sono state terminate per motivi di sicurezza.",
+    "TOO_MANY_REQUESTS": "Troppi tentativi di accesso/verifica OTP. Riprova tra 15 minuti.",
+    "USER_NOT_FOUND": "Nessun record trovato.",
+    "EMAIL_ALREADY_VERIFIED": "Questo indirizzo email è già stato verificato."
+}
