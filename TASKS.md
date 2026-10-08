@@ -84,16 +84,29 @@ Milestone 7: Family Emergency Vault & Production Hardening ───────
 
 ---
 
-## 💡 Milestone 3: Cash Flow Bridge & Investible Surplus Radar
-> **Goal:** Connect daily expense reality to investment capacity. Answer: *"How much money can I safely invest this month without running out of cash?"*
+## 💡 Milestone 3: Cash Flow Bridge & Investible Surplus Radar (User Blueprint Integration)
+> **Core Specification:** Implements the user's proven monthly spreadsheet architecture ([`USER_FINANCIAL_BLUEPRINT.md`](file:///d:/Development/projects/MoneyLens-AI-Powered-Personal-Finance-Budget-Management-Platform/USER_FINANCIAL_BLUEPRINT.md)).  
+> **Goal:** Transform the user's manual monthly spreadsheet into an intelligent, automated 3-pillar engine with live "Rest" variances and real-time "SAVED THIS MONTH" surplus tracking.
 
-- [ ] **3.1 Monthly Cash Flow & Surplus Engine**
-  - [ ] API calculation: `Surplus = Total Income - (Fixed Expenses + Variable Expenses + Emergency Reserve Target)`.
-  - [ ] Track "Committed Investments" vs "Unallocated Surplus".
-  - [ ] Visual Gauge: **Investible Capacity Meter** (`₹24,500 available for SIPs/Policies this month`).
-- [ ] **3.2 Burn Rate & Runway Tracker**
-  - [ ] Daily burn rate tracker: Average spend per day vs remaining budget velocity.
-  - [ ] Month-end projection: Forecasting ending bank balance based on mid-month spending trajectory.
+- [ ] **3.1 The 65 / 20 / 15 Target Allocation Engine**
+  - [ ] Auto-calculate monthly target envelopes from Monthly Income ($₹80,500$):
+    - **Pillar 1: Monthly Expenses (65%)** = $₹40,250$
+    - **Pillar 2: Savings & Investment (20%)** = $₹24,150$
+    - **Pillar 3: Others / EMIs (15%)** = $₹16,100$
+  - [ ] Allow customizable percentage rules (e.g. 65/20/15, 50/30/20, or custom).
+  - [ ] Track real-time **Rest (Variance)** per pillar: `Target - Actual Spend`.
+
+- [ ] **3.2 The 3-Pillar Monthly Dashboard & Recurring Rollover**
+  - [ ] **Pillar 1 (Living Costs)**: Home Loan, Milk, Electricity, School & Van Fees, Petrol, Rasan, Veggies, Family allowances.
+  - [ ] **Pillar 2 (Wealth & Protection)**: NPS, Mishika Sukanya (SKY), LIC, Recurring Deposits (RD), Weekly SIPs, Land Sinking Fund.
+  - [ ] **Pillar 3 (Others & EMIs)**: Credit card settlements, Installment Loans with progress counters (e.g. `HCL GUVI 1/18` -> auto-advances to `2/18`), Occasional events.
+  - [ ] **1-Click Month Rollover**: Automatically carry forward recurring commitments from previous month into the new month without manual re-typing.
+
+- [ ] **3.3 "SAVED THIS MONTH" Net Surplus Radar & Liquid Buffer Transfer**
+  - [ ] Live calculation: $\text{SAVED THIS MONTH} = \text{Income} - (\text{Pillar 1} + \text{Pillar 2} + \text{Pillar 3})$.
+  - [ ] Match user's exact balance formula: $\text{Rest}_1 + \text{Rest}_2 + \text{Rest}_3 = \text{Net Surplus}$.
+  - [ ] 1-Click surplus allocation to liquid reserves or wealth buffer (e.g. `Krishna Saving`).
+  - [ ] Daily burn velocity: Average spend per day vs remaining budget velocity with month-end bank forecast.
 
 ---
 
