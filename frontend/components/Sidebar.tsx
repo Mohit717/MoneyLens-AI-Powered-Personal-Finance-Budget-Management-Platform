@@ -1,23 +1,20 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { logoutUserAction, getCurrentUserAction } from "@/app/actions/auth";
 import {
   LayoutDashboard,
-  RefreshCw,
-  BarChart3,
-  FolderKanban,
-  Users,
-  Database,
-  FileSpreadsheet,
-  FileText,
-  MoreHorizontal,
+  Receipt,
+  TrendingUp,
+  CalendarClock,
+  Sparkles,
+  ShieldCheck,
+  Wallet,
   Settings,
   HelpCircle,
-  Search,
   MoreVertical,
-  Command,
   User,
   CreditCard,
   Bell,
@@ -43,8 +40,8 @@ import {
 export interface SidebarNavItem {
   title: string;
   icon: React.ElementType;
-  href?: string;
-  isActive?: boolean;
+  href: string;
+  badge?: string;
 }
 
 export interface SidebarNavSection {
@@ -54,30 +51,26 @@ export interface SidebarNavSection {
 
 export const navSections: SidebarNavSection[] = [
   {
-    title: "Home",
+    title: "Finance Core",
     items: [
-      { title: "Dashboard", icon: LayoutDashboard, isActive: true },
-      { title: "Lifecycle", icon: RefreshCw },
-      { title: "Analytics", icon: BarChart3 },
-      { title: "Projects", icon: FolderKanban },
-      { title: "Team", icon: Users },
+      { title: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
+      { title: "Expenses & Budgets", icon: Receipt, href: "/expenses" },
+      { title: "Investments", icon: TrendingUp, href: "/investments" },
+      { title: "Cashflow & Dues", icon: CalendarClock, href: "/cashflow" },
     ],
   },
   {
-    title: "Documents",
+    title: "Intelligence & Security",
     items: [
-      { title: "Data Library", icon: Database },
-      { title: "Reports", icon: FileSpreadsheet },
-      { title: "Word Assistant", icon: FileText },
-      { title: "More", icon: MoreHorizontal },
+      { title: "AI Copilot", icon: Sparkles, href: "/copilot", badge: "AI" },
+      { title: "Settings & Vault", icon: ShieldCheck, href: "/settings" },
     ],
   },
 ];
 
 export const footerNavItems: SidebarNavItem[] = [
-  { title: "Settings", icon: Settings },
-  { title: "Get Help", icon: HelpCircle },
-  { title: "Search", icon: Search },
+  { title: "Settings", icon: Settings, href: "/settings" },
+  { title: "Get Help", icon: HelpCircle, href: "/help" },
 ];
 
 interface SidebarProps {
@@ -87,6 +80,7 @@ interface SidebarProps {
 
 export function Sidebar({ isMobileOpen, onMobileOpenChange }: SidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [currentUser, setCurrentUser] = React.useState<{
     name: string;
     email: string;
@@ -109,38 +103,61 @@ export function Sidebar({ isMobileOpen, onMobileOpenChange }: SidebarProps) {
     <div className="flex flex-col justify-between h-full select-none">
       <div>
         {/* Brand Header */}
-        <div className="h-14 flex items-center gap-2.5 px-4 border-b border-sidebar-border">
-          <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-xs">
-            <Command className="w-4 h-4" />
+        <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border">
+          <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+            <Wallet className="w-4 h-4 stroke-[2.5]" />
           </div>
-          <span className="font-semibold text-sidebar-foreground text-sm tracking-tight">
-            Acme Inc.
-          </span>
+          <div className="flex flex-col">
+            <span className="font-bold text-sidebar-foreground text-sm tracking-tight leading-tight">
+              MoneyLens
+            </span>
+            <span className="text-[10px] text-muted-foreground font-medium">
+              AI Wealth & Budget
+            </span>
+          </div>
         </div>
 
         {/* Navigation Menu rendered from navSections array */}
         <div className="p-3 space-y-6 overflow-y-auto">
           {navSections.map((section) => (
             <div key={section.title}>
-              <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider px-2 mb-2">
+              <p className="text-[11px] font-semibold text-muted-foreground/80 uppercase tracking-wider px-2 mb-2">
                 {section.title}
               </p>
               <nav className="space-y-1">
                 {section.items.map((item) => {
                   const Icon = item.icon;
+                  const isActive =
+                    item.href === "/dashboard"
+                      ? pathname === "/dashboard" || pathname === "/"
+                      : pathname?.startsWith(item.href);
+
                   return (
-                    <Button
+                    <Link
                       key={item.title}
-                      variant="ghost"
-                      className={`w-full justify-start gap-3 px-2.5 py-1.5 h-8 text-sm font-medium cursor-pointer ${
-                        item.isActive
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs"
-                          : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
-                      }`}
+                      href={item.href}
+                      onClick={() => onMobileOpenChange(false)}
+                      className="block"
                     >
-                      <Icon className="w-4 h-4" />
-                      {item.title}
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        className={`w-full justify-between px-3 py-2 h-9 text-sm font-medium transition-colors cursor-pointer rounded-lg ${
+                          isActive
+                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold shadow-xs"
+                            : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Icon className={`w-4 h-4 ${isActive ? "text-emerald-600 dark:text-emerald-400" : ""}`} />
+                          <span>{item.title}</span>
+                        </div>
+                        {item.badge && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                            {item.badge}
+                          </span>
+                        )}
+                      </Button>
+                    </Link>
                   );
                 })}
               </nav>
@@ -154,15 +171,26 @@ export function Sidebar({ isMobileOpen, onMobileOpenChange }: SidebarProps) {
         <nav className="space-y-1">
           {footerNavItems.map((item) => {
             const Icon = item.icon;
+            const isActive = pathname?.startsWith(item.href);
             return (
-              <Button
+              <Link
                 key={item.title}
-                variant="ghost"
-                className="w-full justify-start gap-3 px-2.5 py-1.5 h-8 text-sm font-medium text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50 cursor-pointer"
+                href={item.href}
+                onClick={() => onMobileOpenChange(false)}
+                className="block"
               >
-                <Icon className="w-4 h-4" />
-                {item.title}
-              </Button>
+                <Button
+                  variant="ghost"
+                  className={`w-full justify-start gap-3 px-3 py-2 h-9 text-sm font-medium transition-colors cursor-pointer rounded-lg ${
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold shadow-xs"
+                      : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {item.title}
+                </Button>
+              </Link>
             );
           })}
         </nav>
@@ -178,7 +206,7 @@ export function Sidebar({ isMobileOpen, onMobileOpenChange }: SidebarProps) {
                 >
                   <div className="flex items-center gap-2.5">
                     <Avatar className="w-8 h-8 rounded-lg border border-border">
-                      <AvatarFallback className="rounded-lg bg-accent text-accent-foreground font-bold text-xs">
+                      <AvatarFallback className="rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
                         {currentUser.avatarFallback}
                       </AvatarFallback>
                     </Avatar>
@@ -216,15 +244,15 @@ export function Sidebar({ isMobileOpen, onMobileOpenChange }: SidebarProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem className="cursor-pointer gap-2.5 text-xs">
                 <User className="w-4 h-4 text-muted-foreground" />
-                Account
+                Profile & Nominee
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer gap-2.5 text-xs">
                 <CreditCard className="w-4 h-4 text-muted-foreground" />
-                Billing
+                Accounts & Wallets
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer gap-2.5 text-xs">
                 <Bell className="w-4 h-4 text-muted-foreground" />
-                Notifications
+                Due Date Alerts
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem

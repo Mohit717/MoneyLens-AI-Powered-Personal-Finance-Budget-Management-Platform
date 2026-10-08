@@ -1,5 +1,6 @@
 import i18next from 'i18next';
-import middleware from 'i18next-http-middleware';
+import * as i18nextMiddleware from 'i18next-http-middleware';
+const middleware = (i18nextMiddleware as any).default || i18nextMiddleware;
 import Backend from 'i18next-fs-backend';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

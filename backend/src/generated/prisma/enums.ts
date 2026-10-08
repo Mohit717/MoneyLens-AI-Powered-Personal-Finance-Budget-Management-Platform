@@ -32,3 +32,33 @@ export const OtpPurpose = {
 } as const
 
 export type OtpPurpose = (typeof OtpPurpose)[keyof typeof OtpPurpose]
+
+
+export const AccountType = {
+  BANK: 'BANK',
+  CREDIT_CARD: 'CREDIT_CARD',
+  CASH: 'CASH',
+  INVESTMENT: 'INVESTMENT',
+  OTHER: 'OTHER'
+} as const
+
+export type AccountType = (typeof AccountType)[keyof typeof AccountType]
+
+
+export const CategoryType = {
+  INCOME: 'INCOME',
+  EXPENSE: 'EXPENSE',
+  INVESTMENT: 'INVESTMENT'
+} as const
+
+export type CategoryType = (typeof CategoryType)[keyof typeof CategoryType]
+
+
+export const TransactionType = {
+  INCOME: 'INCOME',
+  EXPENSE: 'EXPENSE',
+  TRANSFER: 'TRANSFER',
+  INVESTMENT_ALLOCATION: 'INVESTMENT_ALLOCATION'
+} as const
+
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType]

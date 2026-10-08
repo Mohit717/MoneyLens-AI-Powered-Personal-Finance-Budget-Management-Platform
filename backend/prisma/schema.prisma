@@ -29,6 +29,10 @@ model User {
   updatedAt       DateTime       @updatedAt
   refreshTokens   RefreshToken[]
   logs            AuditLog[]
+  accounts        Account[]
+  categories      Category[]
+  transactions    Transaction[]
+  budgets         Budget[]
 
   @@map("users")
 }
@@ -95,4 +99,116 @@ enum UserStatus {
 enum OtpPurpose {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+}
+
+enum AccountType {
+  BANK
+  CREDIT_CARD
+  CASH
+  INVESTMENT
+  OTHER
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+  INVESTMENT
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+  INVESTMENT_ALLOCATION
+}
+
+model Account {
+  id                      String        @id @default(uuid())
+  userId                  String
+  user                    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name                    String
+  type                    AccountType   @default(BANK)
+  balance                 Decimal       @default(0.00) @db.Decimal(14, 2)
+  currency                String        @default("INR")
+  accountNumber           String?
+  institution             String?
+  isActive                Boolean       @default(true)
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  transactions            Transaction[] @relation("AccountTransactions")
+  destinationTransactions Transaction[] @relation("DestinationAccountTransactions")
+
+  @@index([userId])
+  @@index([userId, isActive])
+  @@map("accounts")
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  userId        String?
+  user          User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String
+  type          CategoryType  @default(EXPENSE)
+  parentId      String?
+  parent        Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  subcategories Category[]    @relation("CategoryHierarchy")
+  icon          String?
+  color         String?
+  isPreset      Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  transactions  Transaction[]
+  budgets       Budget[]
+
+  @@index([userId])
+  @@index([type])
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Transaction {
+  id                   String          @id @default(uuid())
+  userId               String
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId            String
+  account              Account         @relation("AccountTransactions", fields: [accountId], references: [id], onDelete: Cascade)
+  destinationAccountId String?
+  destinationAccount   Account?        @relation("DestinationAccountTransactions", fields: [destinationAccountId], references: [id], onDelete: SetNull)
+  categoryId           String?
+  category             Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  amount               Decimal         @db.Decimal(14, 2)
+  type                 TransactionType
+  date                 DateTime        @default(now())
+  payee                String?
+  description          String?
+  notes                String?
+  tags                 String[]        @default([])
+  receiptUrl           String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([userId, date])
+  @@index([userId, categoryId])
+  @@index([userId, accountId])
+  @@index([userId, type])
+  @@map("transactions")
+}
+
+model Budget {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  monthlyLimit    Decimal  @db.Decimal(14, 2)
+  period          String   // Format: YYYY-MM
+  rolloverEnabled Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, categoryId, period])
+  @@index([userId, period])
+  @@index([categoryId])
+  @@map("budgets")
 }

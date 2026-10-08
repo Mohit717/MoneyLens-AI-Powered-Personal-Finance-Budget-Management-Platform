@@ -54,7 +54,11 @@ export const ModelName = {
   User: 'User',
   RefreshToken: 'RefreshToken',
   AuditLog: 'AuditLog',
-  OtpCode: 'OtpCode'
+  OtpCode: 'OtpCode',
+  Account: 'Account',
+  Category: 'Category',
+  Transaction: 'Transaction',
+  Budget: 'Budget'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -134,6 +138,74 @@ export const OtpCodeScalarFieldEnum = {
 } as const
 
 export type OtpCodeScalarFieldEnum = (typeof OtpCodeScalarFieldEnum)[keyof typeof OtpCodeScalarFieldEnum]
+
+
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  type: 'type',
+  balance: 'balance',
+  currency: 'currency',
+  accountNumber: 'accountNumber',
+  institution: 'institution',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
+export const CategoryScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  type: 'type',
+  parentId: 'parentId',
+  icon: 'icon',
+  color: 'color',
+  isPreset: 'isPreset',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CategoryScalarFieldEnum = (typeof CategoryScalarFieldEnum)[keyof typeof CategoryScalarFieldEnum]
+
+
+export const TransactionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  accountId: 'accountId',
+  destinationAccountId: 'destinationAccountId',
+  categoryId: 'categoryId',
+  amount: 'amount',
+  type: 'type',
+  date: 'date',
+  payee: 'payee',
+  description: 'description',
+  notes: 'notes',
+  tags: 'tags',
+  receiptUrl: 'receiptUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
+export const BudgetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  categoryId: 'categoryId',
+  monthlyLimit: 'monthlyLimit',
+  period: 'period',
+  rolloverEnabled: 'rolloverEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BudgetScalarFieldEnum = (typeof BudgetScalarFieldEnum)[keyof typeof BudgetScalarFieldEnum]
 
 
 export const SortOrder = {

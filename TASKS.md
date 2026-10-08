@@ -10,9 +10,9 @@
 
 ```
 Milestone 0: Enterprise Authentication & Base UI Foundation ────────► [COMPLETED ✅]
-Milestone 1: Daily/Monthly Expense & Budget Engine (Backend) ────────► [CURRENT FOCUS 🚀]
-Milestone 2: Expense Ledger, Budgets & Analytics (Frontend UI) ─────► [NEXT ⏳]
-Milestone 3: Cash Flow Bridge & Investible Surplus Radar ────────────► [PLANNED ⏳]
+Milestone 1: Daily/Monthly Expense & Budget Engine (Backend) ────────► [COMPLETED ✅]
+Milestone 2: Expense Ledger, Budgets & Analytics (Frontend UI) ─────► [COMPLETED ✅]
+Milestone 3: Cash Flow Bridge & Investible Surplus Radar ────────────► [CURRENT FOCUS 🚀]
 Milestone 4: Multi-Asset Investment Engine (LIC, SKY, NPS, SIP, PF) ─► [PLANNED ⏳]
 Milestone 5: Cashflow Calendar, Due-Date Sentinel & Timeline ───────► [PLANNED ⏳]
 Milestone 6: AI Intelligence Layer (Gemini OCR, Copilot & Anomaly) ──► [PLANNED ⏳]
@@ -33,36 +33,36 @@ Milestone 7: Family Emergency Vault & Production Hardening ───────
 
 ---
 
-## 🚀 Milestone 1: Daily/Monthly Expense & Budget Engine (Backend)
+## ✅ Milestone 1: Daily/Monthly Expense & Budget Engine (Backend) (Completed)
 > **Goal:** Create the core financial ledger so the user can accurately record and categorize all inflows (income) and outflows (living expenses, bills, discretionary spending).
 
-- [ ] **1.1 Database Schema Extensions (Prisma)**
-  - [ ] Create `Account` model (e.g. Bank Account, Credit Card, Cash Wallet) with `balance`, `currency`, `accountType`.
-  - [ ] Create `Category` model with hierarchy (`parentId` support), `type` (INCOME, EXPENSE, INVESTMENT), and default preset icons/colors.
-  - [ ] Create `Transaction` model with `amount`, `date`, `type` (INCOME, EXPENSE, TRANSFER, INVESTMENT_ALLOCATION), `accountId`, `categoryId`, `tags`, `notes`, and optional receipt URL.
-  - [ ] Create `Budget` model with `categoryId`, `monthlyLimit`, `period` (YYYY-MM), and `rolloverEnabled`.
-  - [ ] Create indexes for fast filtering by `userId`, `date`, `categoryId`, and `type`.
+- [x] **1.1 Database Schema Extensions (Prisma)**
+  - [x] Create `Account` model (e.g. Bank Account, Credit Card, Cash Wallet) with `balance`, `currency`, `accountType`.
+  - [x] Create `Category` model with hierarchy (`parentId` support), `type` (INCOME, EXPENSE, INVESTMENT), and default preset icons/colors.
+  - [x] Create `Transaction` model with `amount`, `date`, `type` (INCOME, EXPENSE, TRANSFER, INVESTMENT_ALLOCATION), `accountId`, `categoryId`, `tags`, `notes`, and optional receipt URL.
+  - [x] Create `Budget` model with `categoryId`, `monthlyLimit`, `period` (YYYY-MM), and `rolloverEnabled`.
+  - [x] Create indexes for fast filtering by `userId`, `date`, `categoryId`, and `type`.
 
-- [ ] **1.2 Expense & Income REST API Endpoints**
-  - [ ] `GET /api/v1/accounts` & `POST /api/v1/accounts` (Create/List financial accounts).
-  - [ ] `GET /api/v1/categories` & `POST /api/v1/categories` (Category tree with presets).
-  - [ ] `GET /api/v1/transactions` (Paginated list with date-range, category, and account filters).
-  - [ ] `POST /api/v1/transactions` (Create transaction with atomic balance updates).
-  - [ ] `PUT /api/v1/transactions/:id` & `DELETE /api/v1/transactions/:id` (Edit/delete with ledger reconciliation).
-  - [ ] `GET /api/v1/budgets/summary` (Compare budgeted vs actual spend for current month).
-  - [ ] `POST /api/v1/budgets` (Set monthly budget thresholds).
+- [x] **1.2 Expense & Income REST API Endpoints**
+  - [x] `GET /api/v1/accounts` & `POST /api/v1/accounts` (Create/List financial accounts).
+  - [x] `GET /api/v1/categories` & `POST /api/v1/categories` (Category tree with presets).
+  - [x] `GET /api/v1/transactions` (Paginated list with date-range, category, and account filters).
+  - [x] `POST /api/v1/transactions` (Create transaction with atomic balance updates).
+  - [x] `PUT /api/v1/transactions/:id` & `DELETE /api/v1/transactions/:id` (Edit/delete with ledger reconciliation).
+  - [x] `GET /api/v1/budgets/summary` (Compare budgeted vs actual spend for current month).
+  - [x] `POST /api/v1/budgets` (Set monthly budget thresholds).
 
-- [ ] **1.3 Backend Automated Testing**
-  - [ ] Unit tests for ledger balance integrity (ensuring debit and credit match account balances).
-  - [ ] Integration tests for transaction creation, budget calculations, and unauthorized user access prevention.
+- [x] **1.3 Backend Automated Testing**
+  - [x] Unit tests for ledger balance integrity (ensuring debit and credit match account balances).
+  - [x] Integration tests for transaction creation, budget calculations, and unauthorized user access prevention.
 
 ---
 
-## 🎨 Milestone 2: Expense Ledger, Budgets & Analytics (Frontend UI)
+## ✅ Milestone 2: Expense Ledger, Budgets & Analytics (Frontend UI) (Completed)
 > **Goal:** Build a frictionless, high-speed UI where adding daily expenses takes under 5 seconds, and monthly budget progress is crystal clear.
 
-- [ ] **2.1 Sidebar & Navigation Update**
-  - [ ] Update [Sidebar.tsx](file:///d:/Development/projects/as/frontend/components/Sidebar.tsx) navigation:
+- [x] **2.1 Sidebar & Navigation Update**
+  - [x] Update [Sidebar.tsx](file:///d:/Development/projects/MoneyLens-AI-Powered-Personal-Finance-Budget-Management-Platform/frontend/components/Sidebar.tsx) navigation:
     - `Dashboard` (Financial Overview)
     - `Expenses & Budgets` (Daily tracker, budget bars, category breakdown)
     - `Investments` (LIC, SKY, NPS, SIP, PF)
@@ -70,17 +70,17 @@ Milestone 7: Family Emergency Vault & Production Hardening ───────
     - `AI Copilot` (Insights & Chat)
     - `Settings & Vault`
 
-- [ ] **2.2 Quick-Add Transaction Modal / Drawer**
-  - [ ] 1-click "Add Expense / Income" button in header accessible from any screen.
-  - [ ] Numeric keypad / amount input with currency symbol (₹).
-  - [ ] Quick-select category chips (`Food`, `Rent`, `Fuel`, `Shopping`, `Utility`, `Medical`).
-  - [ ] Date picker (defaulting to today) and account selector (`HDFC Bank`, `Credit Card`, `Cash`).
+- [x] **2.2 Quick-Add Transaction Modal / Drawer**
+  - [x] 1-click "Add Expense / Income" button in header accessible from any screen.
+  - [x] Numeric keypad / amount input with currency symbol (₹).
+  - [x] Quick-select category chips (`Food`, `Rent`, `Fuel`, `Shopping`, `Utility`, `Medical`).
+  - [x] Date picker (defaulting to today) and account selector (`HDFC Bank`, `Credit Card`, `Cash`).
 
-- [ ] **2.3 Expense & Budget Page (`/expenses`)**
-  - [ ] **Summary Banner**: Total Income, Total Spent, Remaining Budget, and Days Left in Month.
-  - [ ] **Budget Progress Bars**: Visual progress meters per category (Green < 75%, Yellow 75-99%, Red ≥ 100%).
-  - [ ] **Interactive Transactions Table**: Search by merchant, filter by category/account, inline edit, delete confirmation.
-  - [ ] **Expense Distribution Chart**: Donut chart (Recharts) showing spending breakdown by top categories.
+- [x] **2.3 Expense & Budget Page (`/expenses`)**
+  - [x] **Summary Banner**: Total Income, Total Spent, Remaining Budget, and Days Left in Month.
+  - [x] **Budget Progress Bars**: Visual progress meters per category (Green < 75%, Yellow 75-99%, Red ≥ 100%).
+  - [x] **Interactive Transactions Table**: Search by merchant, filter by category/account, inline edit, delete confirmation.
+  - [x] **Expense Distribution Chart**: Donut chart (Recharts) showing spending breakdown by top categories.
 
 ---
 
