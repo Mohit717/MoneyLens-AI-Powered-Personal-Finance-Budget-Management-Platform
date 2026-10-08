@@ -6,7 +6,8 @@ import { TransactionType } from "@/utils/types";
 interface QuickAddContextType {
   isOpen: boolean;
   defaultType: TransactionType;
-  openQuickAdd: (type?: TransactionType) => void;
+  defaultDate?: string;
+  openQuickAdd: (type?: TransactionType, defaultDate?: string) => void;
   closeQuickAdd: () => void;
 }
 
@@ -15,9 +16,11 @@ const QuickAddContext = createContext<QuickAddContextType | undefined>(undefined
 export function QuickAddProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [defaultType, setDefaultType] = useState<TransactionType>("EXPENSE");
+  const [defaultDate, setDefaultDate] = useState<string | undefined>(undefined);
 
-  const openQuickAdd = (type: TransactionType = "EXPENSE") => {
+  const openQuickAdd = (type: TransactionType = "EXPENSE", initialDate?: string) => {
     setDefaultType(type);
+    setDefaultDate(initialDate);
     setIsOpen(true);
   };
 
@@ -27,7 +30,7 @@ export function QuickAddProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <QuickAddContext.Provider
-      value={{ isOpen, defaultType, openQuickAdd, closeQuickAdd }}
+      value={{ isOpen, defaultType, defaultDate, openQuickAdd, closeQuickAdd }}
     >
       {children}
     </QuickAddContext.Provider>

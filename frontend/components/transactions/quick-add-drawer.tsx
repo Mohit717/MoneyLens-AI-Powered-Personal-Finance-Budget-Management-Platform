@@ -47,7 +47,7 @@ const QUICK_CATEGORY_CHIPS = [
 ];
 
 export function QuickAddTransactionDrawer() {
-  const { isOpen, defaultType, closeQuickAdd } = useQuickAdd();
+  const { isOpen, defaultType, defaultDate, closeQuickAdd } = useQuickAdd();
 
   const [type, setType] = useState<TransactionType>(defaultType);
   const [amount, setAmount] = useState<string>("");
@@ -65,14 +65,19 @@ export function QuickAddTransactionDrawer() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Sync type with defaultType when drawer opens
+  // Sync type and date with context when drawer opens
   useEffect(() => {
     if (isOpen) {
       setType(defaultType);
+      if (defaultDate) {
+        setDate(defaultDate);
+      } else {
+        setDate(new Date().toISOString().split("T")[0]);
+      }
       setErrorMsg(null);
       setSuccessMsg(null);
     }
-  }, [isOpen, defaultType]);
+  }, [isOpen, defaultType, defaultDate]);
 
   // Load Accounts & Categories
   useEffect(() => {

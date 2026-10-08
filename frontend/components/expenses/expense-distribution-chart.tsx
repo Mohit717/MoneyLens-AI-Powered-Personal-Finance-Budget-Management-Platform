@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useSyncExternalStore } from "react";
+import React, { useSyncExternalStore, useMemo } from "react";
 import {
   PieChart,
   Pie,
@@ -10,10 +10,14 @@ import {
 } from "recharts";
 import { formatCompactINR, formatINR } from "@/utils/format";
 import { CategoryBudgetProgress, Transaction } from "@/utils/types";
+import { Button } from "@/components/ui/button";
+import { Plus, PieChart as PieIcon } from "lucide-react";
 
 interface ExpenseDistributionChartProps {
   categoriesProgress: CategoryBudgetProgress[];
   transactions: Transaction[];
+  period?: string;
+  onAddExpense?: () => void;
 }
 
 const PALETTE = [
@@ -35,35 +39,60 @@ const getServerSnapshot = () => false;
 export function ExpenseDistributionChart({
   categoriesProgress,
   transactions,
+  period,
+  onAddExpense,
 }: ExpenseDistributionChartProps) {
   const isMounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  // Group expense transactions by category
-  const expenseTransactions = transactions.filter((t) => t.type === "EXPENSE");
-  const categorySpendMap = new Map<string, number>();
+  // Format month label
+  const formattedMonth = useMemo(() => {
+    if (!period || !/^\d{4}-\d{2}$/.test(period)) return "Selected Month";
+    const [yearStr, monthStr] = period.split("-");
+    const d = new Date(parseInt(yearStr, 10), parseInt(monthStr, 10) - 1, 1);
+    return new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(d);
+  }, [period]);
 
-  for (const tx of expenseTransactions) {
-    const catName = tx.category?.name || "Uncategorized";
-    const current = categorySpendMap.get(catName) || 0;
-    categorySpendMap.set(catName, current + tx.amount);
-  }
+  // Strictly filter transactions by selected period if provided
+  const monthlyExpenses = useMemo(() => {
+    return transactions.filter((t) => {
+      if (t.type !== "EXPENSE" && t.type !== "INVESTMENT_ALLOCATION") return false;
+      if (period && t.date) {
+        return t.date.slice(0, 7) === period;
+      }
+      return true;
+    });
+  }, [transactions, period]);
 
-  // Also include budgeted categories that have spending
-  for (const prog of categoriesProgress) {
-    if (prog.actualSpent > 0 && !categorySpendMap.has(prog.category.name)) {
-      categorySpendMap.set(prog.category.name, prog.actualSpent);
+  // Group monthly expense transactions by category
+  const chartData = useMemo(() => {
+    const categorySpendMap = new Map<string, number>();
+
+    for (const tx of monthlyExpenses) {
+      const catName = tx.category?.name || "Uncategorized";
+      const current = categorySpendMap.get(catName) || 0;
+      categorySpendMap.set(catName, current + tx.amount);
     }
-  }
 
-  const chartData = Array.from(categorySpendMap.entries())
-    .map(([name, value], index) => ({
-      name,
-      value: Math.round(value * 100) / 100,
-      color: PALETTE[index % PALETTE.length],
-    }))
-    .sort((a, b) => b.value - a.value);
+    // Also include budgeted categories that have spending in this month
+    for (const prog of categoriesProgress) {
+      if (prog.actualSpent > 0 && !categorySpendMap.has(prog.category.name)) {
+        categorySpendMap.set(prog.category.name, prog.actualSpent);
+      }
+    }
 
-  const totalSpent = chartData.reduce((acc, curr) => acc + curr.value, 0);
+    return Array.from(categorySpendMap.entries())
+      .map(([name, value], index) => ({
+        name,
+        value: Math.round(value * 100) / 100,
+        color: PALETTE[index % PALETTE.length],
+      }))
+      .sort((a, b) => b.value - a.value);
+  }, [monthlyExpenses, categoriesProgress]);
+
+  const totalSpent = useMemo(
+    () => chartData.reduce((acc, curr) => acc + curr.value, 0),
+    [chartData]
+  );
 
   if (!isMounted) {
     return (
@@ -74,24 +103,46 @@ export function ExpenseDistributionChart({
   }
 
   return (
-    <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-xs flex flex-col justify-between">
-      <div>
-        <h2 className="text-sm font-bold text-foreground tracking-tight">
-          Expense Distribution
-        </h2>
-        <p className="text-xs text-muted-foreground">
-          Monthly spending breakdown by top categories
-        </p>
+    <div className="bg-card rounded-2xl border border-border/60 p-5 shadow-xs flex flex-col justify-between space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-bold text-foreground tracking-tight flex items-center gap-1.5">
+            <PieIcon className="w-4 h-4 text-emerald-500" />
+            <span>Expense Distribution</span>
+          </h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Breakdown for {formattedMonth}
+          </p>
+        </div>
+        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted border border-border/50 text-muted-foreground">
+          {formattedMonth}
+        </span>
       </div>
 
       {chartData.length === 0 || totalSpent === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-2">
-          <div className="w-20 h-20 rounded-full border-4 border-dashed border-border/80 flex items-center justify-center text-muted-foreground text-xs font-medium">
+        <div className="h-64 flex flex-col items-center justify-center text-center p-6 space-y-3">
+          <div className="w-16 h-16 rounded-full border-2 border-dashed border-border flex items-center justify-center text-muted-foreground text-xs font-semibold">
             ₹0.00
           </div>
-          <p className="text-xs text-muted-foreground">
-            No expenses recorded for this month yet.
-          </p>
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-foreground">
+              No expenses in {formattedMonth}
+            </p>
+            <p className="text-[11px] text-muted-foreground max-w-[200px]">
+              Add your daily expenses to see category share and cash burn
+            </p>
+          </div>
+          {onAddExpense && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onAddExpense}
+              className="text-xs gap-1.5 rounded-xl h-8 text-rose-500 border-rose-500/30 hover:bg-rose-500/10 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Expense</span>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-4 my-2">
@@ -129,10 +180,10 @@ export function ExpenseDistributionChart({
               </PieChart>
             </ResponsiveContainer>
 
-            {/* Centered Total Spent Metric */}
+            {/* Centered Total Spent Metric for this Month */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
               <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Total
+                Total Spent
               </span>
               <span className="text-base font-bold text-foreground">
                 {formatCompactINR(totalSpent)}

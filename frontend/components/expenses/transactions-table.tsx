@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Account, Category, Transaction } from "@/utils/types";
 import { formatDate, formatINR } from "@/utils/format";
 import { deleteTransactionAction, updateTransactionAction } from "@/app/actions/finance";
@@ -32,6 +32,8 @@ interface TransactionsTableProps {
   accounts: Account[];
   categories: Category[];
   onTransactionsChanged: () => void;
+  selectedPeriod?: string;
+  onPeriodChange?: (period: string) => void;
 }
 
 interface MonthGroup {
@@ -50,6 +52,8 @@ export function TransactionsTable({
   accounts,
   categories,
   onTransactionsChanged,
+  selectedPeriod,
+  onPeriodChange,
 }: TransactionsTableProps) {
   // Filter States
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,7 +61,14 @@ export function TransactionsTable({
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
   const [accountFilter, setAccountFilter] = useState<string>("ALL");
   const [yearFilter, setYearFilter] = useState<string>("ALL");
-  const [periodFilter, setPeriodFilter] = useState<string>("ALL"); // "ALL" or "YYYY-MM"
+  const [periodFilter, setPeriodFilter] = useState<string>(selectedPeriod || "ALL"); // "ALL" or "YYYY-MM"
+
+  // Sync with external selectedPeriod changes
+  useEffect(() => {
+    if (selectedPeriod) {
+      setPeriodFilter(selectedPeriod);
+    }
+  }, [selectedPeriod]);
 
   // View States
   const [viewMode, setViewMode] = useState<"grouped" | "flat">("grouped");
@@ -566,7 +577,13 @@ export function TransactionsTable({
         {/* Period / Month Selector */}
         <select
           value={periodFilter}
-          onChange={(e) => setPeriodFilter(e.target.value)}
+          onChange={(e) => {
+            const val = e.target.value;
+            setPeriodFilter(val);
+            if (onPeriodChange && val !== "ALL") {
+              onPeriodChange(val);
+            }
+          }}
           className="h-9 px-3 rounded-xl border border-border bg-background text-foreground text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none"
         >
           <option value="ALL">All Months ({yearFilter === "ALL" ? "All Time" : yearFilter})</option>
@@ -634,7 +651,10 @@ export function TransactionsTable({
               <button
                 key={p.key}
                 type="button"
-                onClick={() => setPeriodFilter(p.key)}
+                onClick={() => {
+                  setPeriodFilter(p.key);
+                  if (onPeriodChange) onPeriodChange(p.key);
+                }}
                 className={`px-3 py-1.5 rounded-xl shrink-0 font-medium transition-all cursor-pointer flex items-center gap-1.5 text-xs ${
                   isSelected
                     ? "bg-emerald-600 text-white font-semibold shadow-xs"
