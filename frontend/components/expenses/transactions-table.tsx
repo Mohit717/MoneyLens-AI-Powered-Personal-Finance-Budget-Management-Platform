@@ -549,7 +549,6 @@ export function TransactionsTable({
           onChange={(e) => {
             const nextYear = e.target.value;
             setYearFilter(nextYear);
-            // If current periodFilter doesn't match next year, reset period to ALL
             if (periodFilter !== "ALL" && nextYear !== "ALL" && !periodFilter.startsWith(nextYear)) {
               setPeriodFilter("ALL");
             }
