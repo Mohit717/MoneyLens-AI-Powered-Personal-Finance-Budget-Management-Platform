@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DashboardShell } from "@/components/dashboard-shell";
 
 export const metadata: Metadata = {
-  title: "Acme Inc. Dashboard",
+  title: "MoneyLens Dashboard",
   description: "Enterprise Production-Ready Dashboard",
 };
 

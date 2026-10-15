@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Acme Inc. Dashboard",
+  title: "MoneyLens Dashboard",
   description: "Enterprise Production-Ready Dashboard",
 };
 

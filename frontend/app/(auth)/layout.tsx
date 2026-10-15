@@ -23,7 +23,7 @@ export default function AuthLayout({
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-xs">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <span>Acme Auth</span>
+          <span>MoneyLens</span>
         </Link>
         <div className="flex items-center gap-3">
           <SwitchLanguage />
@@ -40,7 +40,7 @@ export default function AuthLayout({
 
       {/* Footer */}
       <footer className="relative z-10 py-4 px-6 text-center text-xs text-muted-foreground border-t border-border/40 bg-background/60 backdrop-blur-xs">
-        <p>© {new Date().getFullYear()} Acme Inc. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} MoneyLens All rights reserved.</p>
       </footer>
     </div>
   );
