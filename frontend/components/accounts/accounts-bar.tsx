@@ -86,6 +86,22 @@ export function AccountsBar({ accounts, onAccountAdded }: AccountsBarProps) {
           );
         })}
 
+        {accounts.length === 0 && (
+          <div className="p-3 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/5 flex items-center gap-2.5 sm:col-span-2 lg:col-span-3">
+            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500 shrink-0">
+              <Building className="w-4 h-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs font-semibold text-foreground">
+                No accounts connected yet
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                Double-entry bookkeeping requires at least one account to record transactions.
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Add Account Card Button */}
         <button
           type="button"
@@ -99,6 +115,7 @@ export function AccountsBar({ accounts, onAccountAdded }: AccountsBarProps) {
 
       <AddAccountModal
         isOpen={isAddModalOpen}
+        isRequired={accounts.length === 0}
         onClose={() => setIsAddModalOpen(false)}
         onAccountCreated={() => onAccountAdded()}
       />

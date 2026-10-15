@@ -120,6 +120,63 @@ export async function createAccountAction(input: {
   };
 }
 
+export async function updateAccountAction(
+  id: string,
+  input: {
+    name?: string;
+    type?: string;
+    accountNumber?: string | null;
+    institution?: string | null;
+    isActive?: boolean;
+  }
+): Promise<ActionResult<Account>> {
+  const token = await getAuthToken();
+  const res = await apiCall<{ data: { account: Account } }>(`/accounts/${id}`, {
+    method: "PUT",
+    token,
+    body: input,
+  });
+
+  if (res.ok && res.data?.data?.account) {
+    return {
+      success: true,
+      message: "Account updated successfully",
+      data: res.data.data.account,
+    };
+  }
+
+  return {
+    success: false,
+    message: res.message || "Failed to update account",
+  };
+}
+
+export async function deleteAccountAction(
+  id: string
+): Promise<ActionResult<{ success: boolean; softDeleted?: boolean }>> {
+  const token = await getAuthToken();
+  const res = await apiCall<{ data: { success: boolean; softDeleted?: boolean } }>(
+    `/accounts/${id}`,
+    {
+      method: "DELETE",
+      token,
+    }
+  );
+
+  if (res.ok) {
+    return {
+      success: true,
+      message: res.message || "Account removed successfully",
+      data: res.data?.data,
+    };
+  }
+
+  return {
+    success: false,
+    message: res.message || "Failed to delete account",
+  };
+}
+
 // ================= CATEGORIES =================
 
 export async function getCategoriesAction(

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useQuickAdd } from "@/context/quick-add-context";
 import {
   Sheet,
@@ -47,6 +48,7 @@ const QUICK_CATEGORY_CHIPS = [
 ];
 
 export function QuickAddTransactionDrawer() {
+  const router = useRouter();
   const { isOpen, defaultType, defaultDate, closeQuickAdd } = useQuickAdd();
 
   const [type, setType] = useState<TransactionType>(defaultType);
@@ -91,6 +93,9 @@ export function QuickAddTransactionDrawer() {
         }
         if (res.data.accounts.length > 1 && !selectedDestAccountId) {
           setSelectedDestAccountId(res.data.accounts[1].id);
+        }
+        if (res.data.accounts.length === 0) {
+          setIsAddAccountOpen(true);
         }
       }
     });
@@ -193,7 +198,55 @@ export function QuickAddTransactionDrawer() {
           </SheetTitle>
         </SheetHeader>
 
-        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5">
+        {accounts.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-500 flex items-center justify-center">
+              <Building className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1.5 max-w-xs">
+              <h3 className="text-base font-bold text-foreground">
+                Account Required First
+              </h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                At least one active Bank Account, Credit Card, or Cash Wallet is required before entering any transactions.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-muted/60 border border-border/60 text-xs text-left text-muted-foreground space-y-1.5 w-full max-w-xs">
+              <span className="font-semibold text-foreground text-[11px] block">
+                Why is an account required?
+              </span>
+              <p className="text-[11px] leading-relaxed">
+                MoneyLens maintains a strict double-entry ledger. Every rupee earned or spent must be reconciled against an account balance.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full max-w-xs">
+              <Button
+                type="button"
+                onClick={() => setIsAddAccountOpen(true)}
+                className="w-full text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs h-10 gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+                <span>Add Account to Continue</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  closeQuickAdd();
+                  router.push("/settings");
+                }}
+                className="w-full text-xs font-semibold rounded-xl h-9 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <span>Manage Accounts in Settings</span>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* 1. Transaction Type Selector Tabs */}
           <div className="grid grid-cols-3 gap-1.5 p-1 bg-muted/60 rounded-xl border border-border/50 text-xs font-semibold">
             <button
@@ -512,17 +565,19 @@ export function QuickAddTransactionDrawer() {
             </Button>
           </div>
         </form>
+      )}
 
-        {/* Add Account Modal */}
-        <AddAccountModal
-          isOpen={isAddAccountOpen}
-          onClose={() => setIsAddAccountOpen(false)}
-          onAccountCreated={(newAcc) => {
-            setAccounts((prev) => [...prev, newAcc]);
-            setSelectedAccountId(newAcc.id);
-            setErrorMsg(null);
-          }}
-        />
+      {/* Add Account Modal */}
+      <AddAccountModal
+        isOpen={isAddAccountOpen}
+        isRequired={accounts.length === 0}
+        onClose={() => setIsAddAccountOpen(false)}
+        onAccountCreated={(newAcc) => {
+          setAccounts((prev) => [...prev, newAcc]);
+          setSelectedAccountId(newAcc.id);
+          setErrorMsg(null);
+        }}
+      />
       </SheetContent>
     </Sheet>
   );

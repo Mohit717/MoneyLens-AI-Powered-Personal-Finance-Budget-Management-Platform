@@ -14,11 +14,12 @@ import {
   Category,
   Transaction,
 } from "@/utils/types";
+import Link from "next/link";
 import { SummaryBanner } from "@/components/expenses/summary-banner";
-import { AccountsBar } from "@/components/accounts/accounts-bar";
 import { BudgetProgressCards } from "@/components/expenses/budget-progress-cards";
 import { ExpenseDistributionChart } from "@/components/expenses/expense-distribution-chart";
 import { TransactionsTable } from "@/components/expenses/transactions-table";
+import { AddAccountModal } from "@/components/accounts/add-account-modal";
 import { Button } from "@/components/ui/button";
 import {
   RefreshCw,
@@ -27,6 +28,7 @@ import {
   ChevronRight,
   TrendingUp,
   TrendingDown,
+  AlertCircle,
 } from "lucide-react";
 
 export default function ExpensesPage() {
@@ -43,6 +45,8 @@ export default function ExpensesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"INCOME" | "EXPENSE" | null>(null);
 
   // Month navigation helpers
   const goToPrevMonth = () => {
@@ -71,14 +75,24 @@ export default function ExpensesPage() {
     return new Intl.DateTimeFormat("en-IN", { month: "long", year: "numeric" }).format(d);
   }, [period]);
 
-  // Quick Action handlers (pre-filling month date)
+  // Quick Action handlers (pre-filling month date, gated by account existence)
   const handleAddIncome = () => {
+    if (accounts.length === 0) {
+      setPendingAction("INCOME");
+      setIsAddAccountModalOpen(true);
+      return;
+    }
     const today = new Date().toISOString().split("T")[0];
     const initialDate = today.startsWith(period) ? today : `${period}-01`;
     openQuickAdd("INCOME", initialDate);
   };
 
   const handleAddExpense = () => {
+    if (accounts.length === 0) {
+      setPendingAction("EXPENSE");
+      setIsAddAccountModalOpen(true);
+      return;
+    }
     const today = new Date().toISOString().split("T")[0];
     const initialDate = today.startsWith(period) ? today : `${period}-01`;
     openQuickAdd("EXPENSE", initialDate);
@@ -112,15 +126,20 @@ export default function ExpensesPage() {
     loadData();
   }, [loadData]);
 
-  // Listen to global transaction created events
+  // Listen to global transaction and account created events
   useEffect(() => {
     const handleTxCreated = () => {
       loadData(true);
     };
+    const handleAccountCreated = () => {
+      loadData(true);
+    };
 
     window.addEventListener("moneylens:transaction-created", handleTxCreated);
+    window.addEventListener("moneylens:account-created", handleAccountCreated);
     return () => {
       window.removeEventListener("moneylens:transaction-created", handleTxCreated);
+      window.removeEventListener("moneylens:account-created", handleAccountCreated);
     };
   }, [loadData]);
 
@@ -258,6 +277,51 @@ export default function ExpensesPage() {
         </div>
       </div>
 
+      {/* Primary Financial Account Required Gate Banner */}
+      {accounts.length === 0 && !isLoading && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-start gap-3.5">
+            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 shrink-0 mt-0.5 sm:mt-0">
+              <AlertCircle className="w-5 h-5 stroke-[2.5]" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-foreground">
+                  Primary Financial Account Required
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                  Required First Step
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
+                MoneyLens operates on double-entry accounting. At least one Bank Account, Credit Card, or Cash Wallet is required before you can log monthly income or record expenses.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Link href="/settings">
+              <Button
+                variant="outline"
+                className="text-xs font-semibold rounded-xl h-9 px-3.5 gap-1.5 cursor-pointer border-amber-500/30 hover:bg-amber-500/10 text-amber-700 dark:text-amber-300"
+              >
+                <span>Go to Settings</span>
+              </Button>
+            </Link>
+
+            <Button
+              onClick={() => {
+                setPendingAction(null);
+                setIsAddAccountModalOpen(true);
+              }}
+              className="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl h-9 px-4 gap-1.5 cursor-pointer shadow-xs"
+            >
+              <span>+ Quick Add Account</span>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* 2. Month Summary Banner (4 KPIs: Income, Spent, Net Savings, Pace) */}
       <SummaryBanner
         data={budgetSummary}
@@ -267,10 +331,7 @@ export default function ExpensesPage() {
         onAddExpense={handleAddExpense}
       />
 
-      {/* 3. Accounts & Wallets Strip */}
-      <AccountsBar accounts={accounts} onAccountAdded={() => loadData(true)} />
-
-      {/* 4. Main Content Grid: Budgets & Ledger + Distribution Chart */}
+      {/* 3. Main Content Grid: Budgets & Ledger + Distribution Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column (2 Cols): Category Budgets + Month-Synced Transaction Ledger */}
         <div className="lg:col-span-2 space-y-6">
@@ -303,6 +364,29 @@ export default function ExpensesPage() {
           />
         </div>
       </div>
+
+      {/* Account Setup Modal */}
+      <AddAccountModal
+        isOpen={isAddAccountModalOpen}
+        isRequired={accounts.length === 0}
+        onClose={() => {
+          setIsAddAccountModalOpen(false);
+          setPendingAction(null);
+        }}
+        onAccountCreated={(newAcc) => {
+          setAccounts((prev) => [...prev, newAcc]);
+          loadData(true);
+          setIsAddAccountModalOpen(false);
+
+          const target = pendingAction;
+          setPendingAction(null);
+          if (target) {
+            const today = new Date().toISOString().split("T")[0];
+            const initialDate = today.startsWith(period) ? today : `${period}-01`;
+            openQuickAdd(target, initialDate);
+          }
+        }}
+      />
     </div>
   );
 }

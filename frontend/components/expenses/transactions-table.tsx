@@ -679,17 +679,23 @@ export function TransactionsTable({
       {filtered.length === 0 ? (
         <div className="rounded-xl border border-border/50 p-10 text-center space-y-3">
           <p className="text-xs text-muted-foreground">
-            No transactions found matching the selected filters.
+            {accounts.length === 0
+              ? "No financial accounts connected yet. Add an account first to begin tracking transactions."
+              : transactions.length === 0
+              ? "No transactions recorded yet. Add your monthly income or expenses to populate this ledger."
+              : "No transactions found matching the selected filters."}
           </p>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetFilters}
-            className="text-xs gap-1.5 cursor-pointer rounded-xl"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset All Filters</span>
-          </Button>
+          {transactions.length > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetFilters}
+              className="text-xs gap-1.5 cursor-pointer rounded-xl"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </Button>
+          )}
         </div>
       ) : viewMode === "grouped" ? (
         /* ================= GROUPED BY YEAR & MONTH ================= */

@@ -75,12 +75,20 @@ Milestone 7: Family Emergency Vault & Production Hardening ───────
   - [x] Numeric keypad / amount input with currency symbol (₹).
   - [x] Quick-select category chips (`Food`, `Rent`, `Fuel`, `Shopping`, `Utility`, `Medical`).
   - [x] Date picker (defaulting to today) and account selector (`HDFC Bank`, `Credit Card`, `Cash`).
+  - [x] **Zero-Account Gating**: Strictly requires at least one active financial account before allowing transaction entry; intercepts all quick-adds and directs users to add account first.
 
 - [x] **2.3 Expense & Budget Page (`/expenses`)**
   - [x] **Summary Banner**: Total Income, Total Spent, Remaining Budget, and Days Left in Month.
+  - [x] **Primary Account Required Banner**: Contextual banner displayed when zero accounts are found in the system.
   - [x] **Budget Progress Bars**: Visual progress meters per category (Green < 75%, Yellow 75-99%, Red ≥ 100%).
   - [x] **Interactive Transactions Table**: Search by merchant, filter by category/account, inline edit, delete confirmation.
   - [x] **Expense Distribution Chart**: Donut chart (Recharts) showing spending breakdown by top categories.
+
+- [x] **2.4 Settings & Financial Accounts Management (`/settings`)**
+  - [x] **Dedicated Accounts Hub**: Centralized account listing for Bank Accounts, Credit Cards, Cash Wallets, and Investments.
+  - [x] **Complete CRUD**: Full Add, Edit (`EditAccountModal`), and Delete/Archive capabilities with ledger balance integrity.
+  - [x] **Portfolio Summary Metrics**: Total Liquid Balance, Total Credit Card Debt, and Active Accounts counter.
+  - [x] **System & Ledger Preferences**: INR base currency configuration, strict double-entry verification status, and security audit badges.
 
 ---
 

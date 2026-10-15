@@ -12,6 +12,7 @@ import {
   Loader2,
   X,
   CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface AddAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccountCreated?: (account: Account) => void;
+  isRequired?: boolean;
 }
 
 const ACCOUNT_PRESETS = [
@@ -30,7 +32,12 @@ const ACCOUNT_PRESETS = [
   { label: "Credit Card", type: "CREDIT_CARD" as AccountType, name: "ICICI Amazon Pay Card", institution: "ICICI Bank" },
 ];
 
-export function AddAccountModal({ isOpen, onClose, onAccountCreated }: AddAccountModalProps) {
+export function AddAccountModal({
+  isOpen,
+  onClose,
+  onAccountCreated,
+  isRequired = false,
+}: AddAccountModalProps) {
   const [name, setName] = useState("HDFC Salary Account");
   const [type, setType] = useState<AccountType>("BANK");
   const [balance, setBalance] = useState("0");
@@ -97,7 +104,14 @@ export function AddAccountModal({ isOpen, onClose, onAccountCreated }: AddAccoun
               <Building className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">Add Financial Account</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-foreground">Add Financial Account</h3>
+                {isRequired && (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-500 border border-amber-500/30">
+                    Required First Step
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">Bank, Credit Card, or Cash Wallet</p>
             </div>
           </div>
@@ -109,6 +123,19 @@ export function AddAccountModal({ isOpen, onClose, onAccountCreated }: AddAccoun
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Required Alert Banner */}
+        {isRequired && (
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-600 dark:text-amber-400 flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+            <div className="space-y-0.5">
+              <span className="font-bold block text-foreground">Account Required to Start</span>
+              <span className="text-[11px] opacity-90 leading-relaxed block text-muted-foreground">
+                MoneyLens requires at least one active account to record transactions. Please add your primary bank or cash wallet below.
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Quick Presets */}
         <div className="space-y-1.5">
