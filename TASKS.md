@@ -170,12 +170,15 @@ Milestone 7: Family Emergency Vault & Production Hardening ───────
 ---
 
 ## 🤖 Milestone 6: AI Intelligence Layer (Gemini Integration)
-> **Goal:** Automate document entry and provide high-value financial intelligence.
+> **Goal:** Automate document entry and provide high-value financial intelligence.  
+> **Master Specification:** See [`DOCUMENT_INGESTION_AND_AI_EXTRACTION_PLAN.md`](file:///d:/Development/projects/MoneyLens-AI-Powered-Personal-Finance-Budget-Management-Platform/DOCUMENT_INGESTION_AND_AI_EXTRACTION_PLAN.md).
 
-- [ ] **6.1 Zero-Manual Policy Ingestion (OCR & Multimodal Parsing)**
-  - [ ] Drag-and-drop LIC policy bond or Mutual Fund statement PDF/Image.
-  - [ ] Gemini 2.5 Flash multimodal extraction: Automatically extracts Policy Name, Policy No, Term, Premium, Maturity, and Nominee.
-  - [ ] Review & Confirm drawer to verify extracted numbers before saving.
+- [ ] **6.1 Multi-Format Document Ingestion Engine (Images, PDFs, Excel/CSV, Word)**
+  - [ ] **Hybrid Extraction Router**: Fast SheetJS parser for Excel/CSV, Gemini 2.0 Flash Vision for images/PDFs, Mammoth for Word docs.
+  - [ ] **Smart Entity Normalizer**: Automatic clue detection (e.g. `(ICICI CC)` $\rightarrow$ Account, `1/18` $\rightarrow$ Installment EMI, `Petrol` $\rightarrow$ Transportation).
+  - [ ] **Interactive Staging & Confirmation Drawer**: Review grid highlighting rows needing Account/Date with 1-click global assignment toolbars.
+  - [ ] **Atomic Ledger Batch Commit**: Creates validated transactions via Prisma `$transaction` with balance reconciliation.
+  - [ ] **Zero-Manual Policy Ingestion**: Extracts Policy Name, Policy No, Term, Premium, Maturity, and Nominee from bond PDFs.
 - [ ] **6.2 Inflation & Purchasing Power Reality Engine**
   - [ ] AI dynamic widget comparing nominal future payouts with inflation-adjusted value:
     - *"₹13.37 Lakh in 2043 equals ~₹3.9 Lakhs at 6% inflation."*
