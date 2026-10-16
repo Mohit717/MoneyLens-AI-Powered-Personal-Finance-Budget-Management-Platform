@@ -9,6 +9,7 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   ArrowLeftRight,
+  TrendingUp,
   Pencil,
   Trash2,
   Calendar,
@@ -43,6 +44,7 @@ interface MonthGroup {
   transactions: Transaction[];
   income: number;
   expense: number;
+  investment: number;
   transfers: number;
   net: number;
 }
@@ -212,6 +214,7 @@ export function TransactionsTable({
           transactions: [],
           income: 0,
           expense: 0,
+          investment: 0,
           transfers: 0,
           net: 0,
         });
@@ -222,7 +225,9 @@ export function TransactionsTable({
 
       if (tx.type === "INCOME") {
         group.income += tx.amount;
-      } else if (tx.type === "EXPENSE" || tx.type === "INVESTMENT_ALLOCATION") {
+      } else if (tx.type === "INVESTMENT_ALLOCATION") {
+        group.investment += tx.amount;
+      } else if (tx.type === "EXPENSE") {
         group.expense += tx.amount;
       } else if (tx.type === "TRANSFER") {
         group.transfers += tx.amount;
@@ -234,7 +239,7 @@ export function TransactionsTable({
       group.transactions.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       );
-      group.net = group.income - group.expense;
+      group.net = group.income - (group.expense + group.investment);
     }
 
     // Sort groups chronologically descending
@@ -341,7 +346,8 @@ export function TransactionsTable({
   // Render individual transaction row
   const renderTransactionRow = (tx: Transaction) => {
     const isIncome = tx.type === "INCOME";
-    const isExpense = tx.type === "EXPENSE" || tx.type === "INVESTMENT_ALLOCATION";
+    const isInvestment = tx.type === "INVESTMENT_ALLOCATION";
+    const isExpense = tx.type === "EXPENSE";
     const isTransfer = tx.type === "TRANSFER";
     const AccountIcon = getAccountIcon(tx.account?.type);
 
@@ -356,6 +362,8 @@ export function TransactionsTable({
             className={`p-2.5 rounded-xl shrink-0 ${
               isIncome
                 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : isInvestment
+                ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
                 : isExpense
                 ? "bg-rose-500/10 text-rose-500"
                 : "bg-blue-500/10 text-blue-500"
@@ -363,6 +371,8 @@ export function TransactionsTable({
           >
             {isIncome ? (
               <ArrowUpRight className="w-4 h-4 stroke-[2.5]" />
+            ) : isInvestment ? (
+              <TrendingUp className="w-4 h-4 stroke-[2.5]" />
             ) : isExpense ? (
               <ArrowDownLeft className="w-4 h-4 stroke-[2.5]" />
             ) : (
@@ -373,7 +383,7 @@ export function TransactionsTable({
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-foreground truncate">
-                {tx.payee || (isTransfer ? "Internal Transfer" : "Transaction")}
+                {tx.payee || (isTransfer ? "Internal Transfer" : isInvestment ? "Investment Allocation" : "Transaction")}
               </span>
               {tx.category && (
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-muted text-muted-foreground shrink-0 hidden sm:inline-block">
@@ -405,6 +415,8 @@ export function TransactionsTable({
               className={`text-sm font-bold block ${
                 isIncome
                   ? "text-emerald-600 dark:text-emerald-400"
+                  : isInvestment
+                  ? "text-indigo-600 dark:text-indigo-400"
                   : isExpense
                   ? "text-rose-600 dark:text-rose-400"
                   : "text-blue-600 dark:text-blue-400"
@@ -412,12 +424,12 @@ export function TransactionsTable({
             >
               {isIncome
                 ? `+${formatINR(tx.amount)}`
-                : isExpense
+                : (isExpense || isInvestment)
                 ? `-${formatINR(tx.amount)}`
                 : formatINR(tx.amount)}
             </span>
             <span className="text-[10px] text-muted-foreground uppercase font-medium">
-              {tx.type}
+              {isInvestment ? "INVESTMENT" : tx.type}
             </span>
           </div>
 
@@ -521,6 +533,7 @@ export function TransactionsTable({
             {[
               { label: "All", value: "ALL" },
               { label: "Expenses", value: "EXPENSE" },
+              { label: "Investments", value: "INVESTMENT_ALLOCATION" },
               { label: "Income", value: "INCOME" },
               { label: "Transfers", value: "TRANSFER" },
             ].map((tab) => (
@@ -755,6 +768,12 @@ export function TransactionsTable({
                           -{formatINR(group.expense, false)}
                         </span>
                       )}
+                      {group.investment > 0 && (
+                        <span className="text-[10px] sm:text-[11px] font-semibold text-indigo-500 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3 stroke-[2.5]" />
+                          {formatINR(group.investment, false)}
+                        </span>
+                      )}
                       <span
                         className={`text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md border ${
                           group.net > 0
@@ -849,7 +868,11 @@ export function TransactionsTable({
                   >
                     <option value="">-- No Category --</option>
                     {categories
-                      .filter((c) => c.type === editingTx.type)
+                      .filter((c) =>
+                        editingTx.type === "INVESTMENT_ALLOCATION"
+                          ? c.type === "INVESTMENT"
+                          : c.type === editingTx.type
+                      )
                       .map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.name}

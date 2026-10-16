@@ -230,8 +230,15 @@ export async function getCategoriesAction(
     { id: "cat-pocket-money", name: "Pocket Money", type: "EXPENSE", parentId: "cat-family", icon: "Wallet", color: "#8B5CF6", isPreset: true },
     { id: "cat-salary", name: "Salary", type: "INCOME", icon: "Briefcase", color: "#10B981", isPreset: true },
     { id: "cat-freelance", name: "Freelance", type: "INCOME", icon: "Laptop", color: "#34D399", isPreset: true },
-    { id: "cat-mf", name: "Mutual Funds / SIP", type: "INVESTMENT", icon: "TrendingUp", color: "#2563EB", isPreset: true },
-    { id: "cat-lic", name: "LIC & Insurance", type: "INVESTMENT", icon: "Shield", color: "#1D4ED8", isPreset: true },
+    { id: "cat-mf", name: "Mutual Funds & SIP", type: "INVESTMENT", icon: "TrendingUp", color: "#2563EB", isPreset: true },
+    { id: "cat-lic", name: "LIC & Traditional Policies", type: "INVESTMENT", icon: "Shield", color: "#1D4ED8", isPreset: true },
+    { id: "cat-sky", name: "Sukanya Samriddhi (SKY)", type: "INVESTMENT", icon: "Sparkles", color: "#7C3AED", isPreset: true },
+    { id: "cat-nps", name: "National Pension Scheme (NPS)", type: "INVESTMENT", icon: "Landmark", color: "#4F46E5", isPreset: true },
+    { id: "cat-epf", name: "Provident Fund (EPF / PPF)", type: "INVESTMENT", icon: "PiggyBank", color: "#9333EA", isPreset: true },
+    { id: "cat-rd", name: "Recurring Deposit (RD / EMG Fund)", type: "INVESTMENT", icon: "PiggyBank", color: "#059669", isPreset: true },
+    { id: "cat-ti", name: "Term Insurance (TI)", type: "INVESTMENT", icon: "ShieldCheck", color: "#0D9488", isPreset: true },
+    { id: "cat-hl-prepay", name: "Home Loan Prepayment Fund", type: "INVESTMENT", icon: "Home", color: "#3B82F6", isPreset: true },
+    { id: "cat-for-land", name: "For Land (Real Estate Fund)", type: "INVESTMENT", icon: "Coins", color: "#D97706", isPreset: true },
   ];
 
   return {

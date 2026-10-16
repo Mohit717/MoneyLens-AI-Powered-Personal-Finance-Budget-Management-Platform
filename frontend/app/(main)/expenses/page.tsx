@@ -22,6 +22,12 @@ import { TransactionsTable } from "@/components/expenses/transactions-table";
 import { AddAccountModal } from "@/components/accounts/add-account-modal";
 import { Button } from "@/components/ui/button";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   RefreshCw,
   Calendar,
   ChevronLeft,
@@ -29,6 +35,9 @@ import {
   TrendingUp,
   TrendingDown,
   AlertCircle,
+  PiggyBank,
+  Plus,
+  ChevronDown,
 } from "lucide-react";
 
 export default function ExpensesPage() {
@@ -46,7 +55,7 @@ export default function ExpensesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isAddAccountModalOpen, setIsAddAccountModalOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<"INCOME" | "EXPENSE" | null>(null);
+  const [pendingAction, setPendingAction] = useState<"INCOME" | "EXPENSE" | "INVESTMENT_ALLOCATION" | null>(null);
 
   // Month navigation helpers
   const goToPrevMonth = () => {
@@ -96,6 +105,17 @@ export default function ExpensesPage() {
     const today = new Date().toISOString().split("T")[0];
     const initialDate = today.startsWith(period) ? today : `${period}-01`;
     openQuickAdd("EXPENSE", initialDate);
+  };
+
+  const handleAddInvestment = () => {
+    if (accounts.length === 0) {
+      setPendingAction("INVESTMENT_ALLOCATION");
+      setIsAddAccountModalOpen(true);
+      return;
+    }
+    const today = new Date().toISOString().split("T")[0];
+    const initialDate = today.startsWith(period) ? today : `${period}-01`;
+    openQuickAdd("INVESTMENT_ALLOCATION", initialDate);
   };
 
   const loadData = useCallback(async (isSilent = false) => {
@@ -202,7 +222,7 @@ export default function ExpensesPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Month Navigator Controls: Previous < Month Selector > Next */}
           <div className="flex items-center bg-background border border-border/80 rounded-xl p-1 shadow-xs">
             <Button
@@ -253,27 +273,62 @@ export default function ExpensesPage() {
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
           </Button>
 
-          {/* + Add Income CTA ("user month wise apna paisa add karega") */}
-          <Button
-            size="sm"
-            onClick={handleAddIncome}
-            className="gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs px-3.5 h-9 cursor-pointer"
-            title="Add income received for this month"
-          >
-            <TrendingUp className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>+ Add Income</span>
-          </Button>
+          {/* Unified Add Transaction Dropdown (Income, Investment, Expense) */}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  size="sm"
+                  className="gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs px-3.5 h-9 cursor-pointer"
+                  title="Add Income, Investment, or Expense"
+                >
+                  <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+                  <span>Add Transaction</span>
+                  <ChevronDown className="w-3.5 h-3.5 opacity-80" />
+                </Button>
+              }
+            />
+            <DropdownMenuContent align="end" className="w-56 p-1.5 rounded-xl border border-border shadow-lg bg-card">
+              <DropdownMenuItem
+                onClick={handleAddExpense}
+                className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-lg cursor-pointer hover:bg-rose-500/10 text-foreground hover:text-rose-500 transition-colors"
+              >
+                <div className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 shrink-0">
+                  <TrendingDown className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground">Add Expense</span>
+                  <span className="text-[10px] text-muted-foreground">Daily spending & bills</span>
+                </div>
+              </DropdownMenuItem>
 
-          {/* + Add Expense CTA ("fir us month k expenses add karengey") */}
-          <Button
-            size="sm"
-            onClick={handleAddExpense}
-            className="gap-1.5 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs px-3.5 h-9 cursor-pointer"
-            title="Add an expense for this month"
-          >
-            <TrendingDown className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>+ Add Expense</span>
-          </Button>
+              <DropdownMenuItem
+                onClick={handleAddInvestment}
+                className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-lg cursor-pointer hover:bg-indigo-500/10 text-foreground hover:text-indigo-500 transition-colors"
+              >
+                <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-500 shrink-0">
+                  <PiggyBank className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground">Add Investment</span>
+                  <span className="text-[10px] text-muted-foreground">SIP, RD, NPS, Land, etc.</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                onClick={handleAddIncome}
+                className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-lg cursor-pointer hover:bg-emerald-500/10 text-foreground hover:text-emerald-500 transition-colors"
+              >
+                <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                  <TrendingUp className="w-4 h-4 stroke-[2.5]" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-foreground">Add Income</span>
+                  <span className="text-[10px] text-muted-foreground">Salary & inflows</span>
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

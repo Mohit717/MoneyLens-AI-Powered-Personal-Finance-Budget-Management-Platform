@@ -25,6 +25,11 @@ import {
   ShoppingBag,
   Zap,
   HeartPulse,
+  TrendingUp,
+  PiggyBank,
+  Shield,
+  Sparkles,
+  Coins,
   ArrowDownLeft,
   ArrowUpRight,
   ArrowLeftRight,
@@ -45,6 +50,15 @@ const QUICK_CATEGORY_CHIPS = [
   { label: "Shopping", nameMatch: "Shopping", icon: ShoppingBag, color: "text-purple-500 bg-purple-500/10 border-purple-500/20" },
   { label: "Utility", nameMatch: "Utilities", icon: Zap, color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20" },
   { label: "Medical", nameMatch: "Healthcare", icon: HeartPulse, color: "text-red-500 bg-red-500/10 border-red-500/20" },
+];
+
+const QUICK_INVESTMENT_CHIPS = [
+  { label: "NPS", nameMatch: "NPS", icon: Building, color: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20" },
+  { label: "Mishika SKY", nameMatch: "SKY", icon: Sparkles, color: "text-purple-500 bg-purple-500/10 border-purple-500/20" },
+  { label: "LIC", nameMatch: "LIC", icon: Shield, color: "text-blue-500 bg-blue-500/10 border-blue-500/20" },
+  { label: "Weekly SIP", nameMatch: "SIP", icon: TrendingUp, color: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" },
+  { label: "RD Priti", nameMatch: "RD", icon: PiggyBank, color: "text-teal-500 bg-teal-500/10 border-teal-500/20" },
+  { label: "For Land", nameMatch: "Land", icon: Coins, color: "text-amber-500 bg-amber-500/10 border-amber-500/20" },
 ];
 
 export function QuickAddTransactionDrawer() {
@@ -71,6 +85,11 @@ export function QuickAddTransactionDrawer() {
   useEffect(() => {
     if (isOpen) {
       setType(defaultType);
+      if (categories.length > 0) {
+        const targetType = defaultType === "INVESTMENT_ALLOCATION" ? "INVESTMENT" : defaultType;
+        const matchingCat = categories.find((c) => c.type === targetType);
+        if (matchingCat) setSelectedCategoryId(matchingCat.id);
+      }
       if (defaultDate) {
         setDate(defaultDate);
       } else {
@@ -79,7 +98,7 @@ export function QuickAddTransactionDrawer() {
       setErrorMsg(null);
       setSuccessMsg(null);
     }
-  }, [isOpen, defaultType, defaultDate]);
+  }, [isOpen, defaultType, defaultDate, categories]);
 
   // Load Accounts & Categories
   useEffect(() => {
@@ -104,12 +123,13 @@ export function QuickAddTransactionDrawer() {
       if (res.success && res.data) {
         setCategories(res.data);
         if (!selectedCategoryId && res.data.length > 0) {
-          const firstExp = res.data.find((c) => c.type === "EXPENSE");
-          if (firstExp) setSelectedCategoryId(firstExp.id);
+          const targetType = defaultType === "INVESTMENT_ALLOCATION" ? "INVESTMENT" : defaultType;
+          const firstCat = res.data.find((c) => c.type === targetType) || res.data[0];
+          if (firstCat) setSelectedCategoryId(firstCat.id);
         }
       }
     });
-  }, [isOpen]);
+  }, [isOpen, defaultType]);
 
   const handleQuickAmount = (delta: number) => {
     const current = parseFloat(amount) || 0;
@@ -248,7 +268,7 @@ export function QuickAddTransactionDrawer() {
         ) : (
           <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 space-y-5">
           {/* 1. Transaction Type Selector Tabs */}
-          <div className="grid grid-cols-3 gap-1.5 p-1 bg-muted/60 rounded-xl border border-border/50 text-xs font-semibold">
+          <div className="grid grid-cols-4 gap-1 p-1 bg-muted/60 rounded-xl border border-border/50 text-xs font-semibold">
             <button
               type="button"
               onClick={() => {
@@ -256,14 +276,30 @@ export function QuickAddTransactionDrawer() {
                 const expCat = categories.find((c) => c.type === "EXPENSE");
                 if (expCat) setSelectedCategoryId(expCat.id);
               }}
-              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1 py-2 rounded-lg transition-all cursor-pointer ${
                 type === "EXPENSE"
                   ? "bg-rose-500 text-white shadow-xs font-bold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <ArrowDownLeft className="w-3.5 h-3.5" />
-              <span>Expense</span>
+              <ArrowDownLeft className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Expense</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setType("INVESTMENT_ALLOCATION");
+                const invCat = categories.find((c) => c.type === "INVESTMENT");
+                if (invCat) setSelectedCategoryId(invCat.id);
+              }}
+              className={`flex items-center justify-center gap-1 py-2 rounded-lg transition-all cursor-pointer ${
+                type === "INVESTMENT_ALLOCATION"
+                  ? "bg-indigo-600 text-white shadow-xs font-bold"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Invest</span>
             </button>
             <button
               type="button"
@@ -272,26 +308,26 @@ export function QuickAddTransactionDrawer() {
                 const incCat = categories.find((c) => c.type === "INCOME");
                 if (incCat) setSelectedCategoryId(incCat.id);
               }}
-              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1 py-2 rounded-lg transition-all cursor-pointer ${
                 type === "INCOME"
                   ? "bg-emerald-600 text-white shadow-xs font-bold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <ArrowUpRight className="w-3.5 h-3.5" />
-              <span>Income</span>
+              <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Income</span>
             </button>
             <button
               type="button"
               onClick={() => setType("TRANSFER")}
-              className={`flex items-center justify-center gap-1.5 py-2 rounded-lg transition-all cursor-pointer ${
+              className={`flex items-center justify-center gap-1 py-2 rounded-lg transition-all cursor-pointer ${
                 type === "TRANSFER"
                   ? "bg-blue-600 text-white shadow-xs font-bold"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              <ArrowLeftRight className="w-3.5 h-3.5" />
-              <span>Transfer</span>
+              <ArrowLeftRight className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Transfer</span>
             </button>
           </div>
 
@@ -336,7 +372,7 @@ export function QuickAddTransactionDrawer() {
             </div>
           </div>
 
-          {/* 3. Category Selection (For Expense / Income) */}
+          {/* 3. Category Selection (For Expense / Invest / Income) */}
           {type !== "TRANSFER" && (
             <div className="space-y-2.5">
               <Label className="text-xs font-semibold text-muted-foreground">
@@ -376,6 +412,39 @@ export function QuickAddTransactionDrawer() {
                 </div>
               )}
 
+              {/* Quick Category Chips for Invest */}
+              {type === "INVESTMENT_ALLOCATION" && (
+                <div className="grid grid-cols-3 gap-2">
+                  {QUICK_INVESTMENT_CHIPS.map((chip) => {
+                    const ChipIcon = chip.icon;
+                    const matched = categories.find((c) =>
+                      c.name.toLowerCase().includes(chip.nameMatch.toLowerCase())
+                    );
+                    const isSelected = matched && selectedCategoryId === matched.id;
+
+                    return (
+                      <button
+                        key={chip.label}
+                        type="button"
+                        onClick={() => {
+                          if (matched) setSelectedCategoryId(matched.id);
+                        }}
+                        className={`flex flex-col items-center justify-center p-2 rounded-xl border transition-all cursor-pointer text-center ${
+                          isSelected
+                            ? "border-indigo-500 ring-2 ring-indigo-500/20 bg-indigo-500/10 font-bold"
+                            : "border-border/60 hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        <div className={`p-1.5 rounded-lg mb-1 ${chip.color}`}>
+                          <ChipIcon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs truncate w-full">{chip.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               {/* Full Category Select Dropdown */}
               <select
                 value={selectedCategoryId}
@@ -384,7 +453,7 @@ export function QuickAddTransactionDrawer() {
               >
                 <option value="">-- Choose Category --</option>
                 {categories
-                  .filter((c) => c.type === type)
+                  .filter((c) => (type === "INVESTMENT_ALLOCATION" ? c.type === "INVESTMENT" : c.type === type))
                   .map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}

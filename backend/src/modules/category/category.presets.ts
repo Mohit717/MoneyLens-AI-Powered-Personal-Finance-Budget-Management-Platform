@@ -176,5 +176,29 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
     icon: 'Coins',
     color: '#D97706',
   },
+  {
+    name: 'Recurring Deposit (RD / EMG Fund)',
+    type: 'INVESTMENT',
+    icon: 'PiggyBank',
+    color: '#059669',
+  },
+  {
+    name: 'Term Insurance (TI)',
+    type: 'INVESTMENT',
+    icon: 'ShieldCheck',
+    color: '#0D9488',
+  },
+  {
+    name: 'Home Loan Prepayment Fund',
+    type: 'INVESTMENT',
+    icon: 'Home',
+    color: '#3B82F6',
+  },
+  {
+    name: 'For Land (Real Estate Fund)',
+    type: 'INVESTMENT',
+    icon: 'Coins',
+    color: '#D97706',
+  },
 ];
 
