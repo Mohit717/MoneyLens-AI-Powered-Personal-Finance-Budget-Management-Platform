@@ -207,10 +207,18 @@ export async function getCategoriesAction(
   );
 
   if (res.ok && res.data?.data?.categories) {
+    const seen = new Set<string>();
+    const uniqueCategories = res.data.data.categories.filter((cat) => {
+      const key = `${cat.name}_${cat.type}_${cat.parentId || "root"}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
     return {
       success: true,
       message: "Categories fetched",
-      data: res.data.data.categories,
+      data: uniqueCategories,
     };
   }
 
