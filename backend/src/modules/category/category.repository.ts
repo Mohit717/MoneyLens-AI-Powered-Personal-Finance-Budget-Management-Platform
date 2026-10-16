@@ -5,41 +5,53 @@ import { PRESET_CATEGORIES } from "./category.presets.js";
 export class CategoryRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
-  async seedPresetsIfEmpty(): Promise<void> {
-    const presetCount = await this.prisma.category.count({
-      where: { isPreset: true },
-    });
+  private static hasCheckedPresets = false;
 
-    if (presetCount > 0) return;
+  async seedPresetsIfEmpty(): Promise<void> {
+    if (CategoryRepository.hasCheckedPresets) return;
 
     for (const preset of PRESET_CATEGORIES) {
-      const parent = await this.prisma.category.create({
-        data: {
-          name: preset.name,
-          type: preset.type as CategoryType,
-          icon: preset.icon,
-          color: preset.color,
-          isPreset: true,
-          userId: null,
-        },
+      let parent = await this.prisma.category.findFirst({
+        where: { name: preset.name, isPreset: true },
       });
+
+      if (!parent) {
+        parent = await this.prisma.category.create({
+          data: {
+            name: preset.name,
+            type: preset.type as CategoryType,
+            icon: preset.icon,
+            color: preset.color,
+            isPreset: true,
+            userId: null,
+          },
+        });
+      }
 
       if (preset.subcategories && preset.subcategories.length > 0) {
         for (const sub of preset.subcategories) {
-          await this.prisma.category.create({
-            data: {
-              name: sub.name,
-              type: preset.type as CategoryType,
-              icon: sub.icon,
-              color: sub.color,
-              parentId: parent.id,
-              isPreset: true,
-              userId: null,
-            },
+          const subExists = await this.prisma.category.findFirst({
+            where: { name: sub.name, parentId: parent.id, isPreset: true },
           });
+
+          if (!subExists) {
+            await this.prisma.category.create({
+              data: {
+                name: sub.name,
+                type: preset.type as CategoryType,
+                icon: sub.icon,
+                color: sub.color,
+                parentId: parent.id,
+                isPreset: true,
+                userId: null,
+              },
+            });
+          }
         }
       }
     }
+
+    CategoryRepository.hasCheckedPresets = true;
   }
 
   async findAll(userId: string, type?: CategoryType): Promise<Category[]> {

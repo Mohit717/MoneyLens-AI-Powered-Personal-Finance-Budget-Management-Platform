@@ -89,6 +89,17 @@ export const PRESET_CATEGORIES: PresetCategory[] = [
       { name: 'Books & Supplies', icon: 'Bookmark', color: '#22D3EE' },
     ],
   },
+  {
+    name: 'Family & Personal Support',
+    type: 'EXPENSE',
+    icon: 'Heart',
+    color: '#F43F5E',
+    subcategories: [
+      { name: 'Spouse Support', icon: 'Sparkles', color: '#D946EF' },
+      { name: 'Family Support', icon: 'Heart', color: '#F43F5E' },
+      { name: 'Pocket Money', icon: 'Wallet', color: '#8B5CF6' },
+    ],
+  },
 
   // INCOME
   {
