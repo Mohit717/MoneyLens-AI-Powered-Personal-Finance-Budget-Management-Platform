@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SessionKeeper } from "@/components/auth/session-keeper";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 
@@ -52,7 +53,8 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           <NextIntlClientProvider messages={messages}>
-          {children}
+            <SessionKeeper />
+            {children}
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

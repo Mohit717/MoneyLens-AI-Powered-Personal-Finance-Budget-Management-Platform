@@ -123,13 +123,89 @@ export async function loginUserAction(input: LoginActionInput): Promise<ActionRe
 }
 
 /**
+ * Server Action: Refresh Access Token using Refresh Token (RTR)
+ */
+export async function refreshTokenAction(): Promise<string | null> {
+  const cookieStore = await cookies();
+  const currentRefreshToken = cookieStore.get("refreshToken")?.value;
+
+  if (!currentRefreshToken) {
+    return null;
+  }
+
+  try {
+    const res = await apiCall<{
+      data: { accessToken: string; refreshToken?: string };
+    }>("/auth/refresh", {
+      method: "POST",
+      body: { refreshToken: currentRefreshToken },
+      headers: {
+        Cookie: `refreshToken=${currentRefreshToken}`,
+        "x-refresh-token": currentRefreshToken,
+      },
+    });
+
+    const accessToken = res.data?.data?.accessToken;
+    const newRefreshToken = res.data?.data?.refreshToken;
+
+    if (res.ok && accessToken) {
+      cookieStore.set("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60, // 15 mins
+      });
+
+      if (newRefreshToken) {
+        cookieStore.set("refreshToken", newRefreshToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 7 * 24 * 60 * 60, // 7 days
+        });
+      }
+
+      return accessToken;
+    }
+
+    // If refresh token is expired or revoked by server
+    if (res.status === 401 || res.status === 403) {
+      cookieStore.delete("accessToken");
+      cookieStore.delete("refreshToken");
+      cookieStore.delete("userProfile");
+      cookieStore.delete("session");
+    }
+
+    return null;
+  } catch (err) {
+    console.warn("refreshTokenAction error:", err);
+    return null;
+  }
+}
+
+/**
  * Server Action: Get Current Logged-in User Profile
  */
 export async function getCurrentUserAction(): Promise<{ name: string; email: string; avatarFallback: string } | null> {
   const cookieStore = await cookies();
-  const userProfileRaw = cookieStore.get("userProfile")?.value;
 
-  if (userProfileRaw) {
+  let accessToken = cookieStore.get("accessToken")?.value;
+
+  // If accessToken has expired, attempt silent background rotation using refreshToken!
+  if (!accessToken) {
+    const refreshToken = cookieStore.get("refreshToken")?.value;
+    if (refreshToken) {
+      const renewedToken = await refreshTokenAction();
+      if (renewedToken) {
+        accessToken = renewedToken;
+      }
+    }
+  }
+
+  const userProfileRaw = cookieStore.get("userProfile")?.value;
+  if (userProfileRaw && accessToken) {
     try {
       const parsed = JSON.parse(userProfileRaw);
       const name = parsed.name || parsed.email?.split("@")[0] || "User";
@@ -141,13 +217,10 @@ export async function getCurrentUserAction(): Promise<{ name: string; email: str
     }
   }
 
-  const accessToken = cookieStore.get("accessToken")?.value;
   if (accessToken) {
-    const res = await apiCall("/auth/me", {
+    const res = await apiCall<{ data: { user: { name?: string; email?: string } } }>("/auth/me", {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
+      token: accessToken,
     });
 
     if (res.ok && res.data?.data?.user) {

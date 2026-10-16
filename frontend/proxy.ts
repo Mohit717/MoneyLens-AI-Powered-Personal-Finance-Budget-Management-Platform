@@ -20,11 +20,15 @@ export function proxy(request: NextRequest) {
     pathname === "/forgot-password" ||
     pathname === "/reset-password";
 
-  // Protected main pages (root, dashboard)
+  // Protected main pages (root, dashboard, expenses, settings, investments, cashflow, copilot)
   const isMainRoute =
     pathname === "/" ||
-    pathname === "/dashboard" ||
-    pathname.startsWith("/dashboard/");
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/expenses") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/investments") ||
+    pathname.startsWith("/cashflow") ||
+    pathname.startsWith("/copilot");
 
   // 1. If user is NOT logged in and tries to access main protected pages -> Redirect to /login
   if (!isAuthenticated && isMainRoute) {

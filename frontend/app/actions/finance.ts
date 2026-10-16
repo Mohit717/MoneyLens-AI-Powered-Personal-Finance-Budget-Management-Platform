@@ -13,10 +13,24 @@ import {
   SetBudgetInput,
   UpdateTransactionInput,
 } from "@/utils/types";
+import { refreshTokenAction } from "@/app/actions/auth";
 
 async function getAuthToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  return cookieStore.get("accessToken")?.value;
+  let token = cookieStore.get("accessToken")?.value;
+
+  // If short-lived accessToken is expired, automatically rotate and renew using refreshToken!
+  if (!token) {
+    const refreshToken = cookieStore.get("refreshToken")?.value;
+    if (refreshToken) {
+      const renewedToken = await refreshTokenAction();
+      if (renewedToken) {
+        token = renewedToken;
+      }
+    }
+  }
+
+  return token;
 }
 
 // ================= ACCOUNTS =================

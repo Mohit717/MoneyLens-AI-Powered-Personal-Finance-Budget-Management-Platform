@@ -44,11 +44,11 @@ export class AuthController {
       const input = loginSchema.parse(req.body);
       const { user, accessToken, refreshToken } = await this.authService.login(input);
 
-      // Set Refresh Token in HttpOnly, Secure, SameSite=Strict Cookie
+      // Set Refresh Token in HttpOnly, Secure, SameSite=Lax Cookie
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
@@ -63,7 +63,7 @@ export class AuthController {
       return ResponseHandler.success({
         res,
         message: "Login successful",
-        data: { user, accessToken },
+        data: { user, accessToken, refreshToken },
       });
     } catch (error) {
       next(error);
@@ -156,9 +156,13 @@ export class AuthController {
 
   refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const refreshToken = req.cookies?.refreshToken;
+      const refreshToken =
+        req.cookies?.refreshToken ||
+        req.body?.refreshToken ||
+        (req.headers["x-refresh-token"] as string | undefined);
+
       if (!refreshToken) {
-        throw new Error('UNAUTHORIZED')
+        throw new Error('UNAUTHORIZED');
       }
 
       const { accessToken, refreshToken: newRefreshToken } =
@@ -168,14 +172,14 @@ export class AuthController {
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       return ResponseHandler.success({
         res,
         message: 'Token rotated successfully',
-        data: { accessToken },
+        data: { accessToken, refreshToken: newRefreshToken },
       });
     } catch (error) {
       res.clearCookie('refreshToken');
@@ -185,7 +189,11 @@ export class AuthController {
 
   logout = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const refreshToken = req.cookies?.refreshToken;
+      const refreshToken =
+        req.cookies?.refreshToken ||
+        req.body?.refreshToken ||
+        (req.headers["x-refresh-token"] as string | undefined);
+
       if (refreshToken) {
         await AuthSessionService.revokeSession(refreshToken);
       }
